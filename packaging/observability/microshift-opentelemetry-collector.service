@@ -1,0 +1,25 @@
+[Unit]
+Description=OpenTelemetry Collector
+BindsTo=microshift.service
+After=microshift.service
+AssertPathExists=/var/lib/microshift/certs/kube-apiserver-localhost-signer/opentelemetry-collector-client/client.key
+AssertPathExists=/var/lib/microshift/certs/kube-apiserver-localhost-signer/opentelemetry-collector-client/client.crt
+
+[Service]
+ExecStartPre=+/bin/mkdir -p /etc/pki/microshift-opentelemetry-collector-client/
+ExecStartPre=+/bin/cp /var/lib/microshift/certs/kube-apiserver-localhost-signer/opentelemetry-collector-client/client.key /etc/pki/microshift-opentelemetry-collector-client/
+ExecStartPre=+/bin/cp /var/lib/microshift/certs/kube-apiserver-localhost-signer/opentelemetry-collector-client/client.crt /etc/pki/microshift-opentelemetry-collector-client/
+ExecStartPre=+/bin/chown -R observability /etc/pki/microshift-opentelemetry-collector-client
+ExecStartPre=+/bin/chmod -R 600 /etc/pki/microshift-opentelemetry-collector-client/
+ExecStartPre=+/bin/chmod 755 /etc/pki/microshift-opentelemetry-collector-client
+
+ExecStart=/usr/bin/opentelemetry-collector --config=/etc/microshift/opentelemetry-collector.yaml
+Restart=always
+User=observability
+TimeoutStartSec=60
+# It takes a bit for the certs to be created. This service will reach it's burst limit almost immediately, pretty much
+# guaranteeing that it will reach the restart limit before it can possibly succeed.
+RestartSec=200ms
+
+[Install]
+WantedBy=multi-user.target
