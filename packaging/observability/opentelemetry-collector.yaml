@@ -8,6 +8,7 @@ receivers:
 #    Path: /….
   kubeletstats:
     auth_type: tls
+    ca_file: /etc/pki/microshift-opentelemetry-collector-client/client-ca.crt
     key_file: /etc/pki/microshift-opentelemetry-collector-client/client.key
     cert_file: /etc/pki/microshift-opentelemetry-collector-client/client.crt
     insecure_skip_verify: true
@@ -45,7 +46,7 @@ exporters:
   otlp:
     sending_queue:
       storage: file_storage
-    endpoint: 192.168.100.194:4317
+    endpoint: # IP|HOSTNAME REQUIRED
     tls:
       insecure: true
   debug:
