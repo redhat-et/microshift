@@ -268,7 +268,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		).WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
-					Name: "opentelemetry-collector-client",
+					Name: "observability",
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
 				UserInfo: &user.DefaultInfo{Name: "observability", Groups: []string{"observability"},
