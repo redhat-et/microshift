@@ -6,17 +6,9 @@ AssertPathExists=/var/lib/microshift/certs/kube-apiserver-localhost-signer/obser
 AssertPathExists=/var/lib/microshift/certs/kube-apiserver-localhost-signer/observability/client.crt
 
 [Service]
-ExecStartPre=+/bin/mkdir -p /etc/pki/microshift-observability/
-ExecStartPre=+/bin/cp /var/lib/microshift/certs/kube-apiserver-localhost-signer/observability/client.key /etc/pki/microshift-observability/
-ExecStartPre=+/bin/cp /var/lib/microshift/certs/kube-apiserver-localhost-signer/observability/client.key /etc/pki/microshift-observability/
-ExecStartPre=+/bin/cp /var/lib/microshift/certs/kube-apiserver-localhost-signer/observability/client.crt /etc/pki/microshift-observability/
-ExecStartPre=+/bin/chown -R observability /etc/pki/microshift-observability
-ExecStartPre=+/bin/chmod -R 600 /etc/pki/microshift-observability/
-ExecStartPre=+/bin/chmod 755 /etc/pki/microshift-observability
-
 ExecStart=/usr/bin/opentelemetry-collector --config=/etc/microshift/opentelemetry-collector.yaml
 Restart=always
-User=observability
+User=root
 TimeoutStartSec=60
 
 # It takes a bit for the certs to be created. This service will reach it's burst limit almost immediately, pretty much
