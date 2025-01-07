@@ -1,0 +1,28 @@
+FROM registry.redhat.io/rhel9/rhel-bootc:9.4
+
+ARG USHIFT_VER=4.17
+RUN if [ -z "${MIRROR_REPO}" ]; then \
+      dnf config-manager --set-enabled "rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms" \
+          --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms"; \
+    else \
+      # This is required to update the gpgcheck for repoID
+      repoID=$(echo "${MIRROR_REPO#*://}" | tr '/:' '_'); \
+      dnf config-manager --add-repo "${MIRROR_REPO}" \
+          --add-repo "https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/${USHIFT_VER}-el9-beta" \
+          --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms"; \
+      dnf config-manager --save --setopt="${repoID}".gpgcheck=0 --setopt=*-el9-beta.gpgcheck=0; \
+    fi
+RUN dnf install -y firewalld microshift microshift-release-info && \
+    systemctl enable microshift && \
+    dnf clean all
+
+# Mandatory firewall configuration
+RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
+    firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \
+    firewall-offline-cmd --zone=trusted --add-source=169.254.169.1 && \
+    firewall-offline-cmd --zone=trusted --add-source=fd01::/48
+# Application-specific firewall configuration
+RUN firewall-offline-cmd --zone=public --add-port=80/tcp && \
+    firewall-offline-cmd --zone=public --add-port=443/tcp && \
+    firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
+    firewall-offline-cmd --zone=public --add-port=30000-32767/udp
