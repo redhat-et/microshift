@@ -16,10 +16,10 @@ clean_podman_images() {
 
     title "Cleaning up running containers"
     for id in $(sudo podman ps -a | awk '{print $1}') ; do
-        sudo podman rm -f "${id}"
+        sudo podman rm -f --volumes --time 0 "${id}" || true
     done
     for id in $(podman ps -a | awk '{print $1}') ; do
-        podman rm -f "${id}"
+        podman rm -f --volumes --time 0 "${id}" || true
     done
 
     if [ "${FULL_CLEAN}" = 1 ] ; then
