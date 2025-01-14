@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
 )
@@ -40,10 +41,6 @@ func (o *OVNKubernetesConfig) Validate() error {
 	if err != nil {
 		return fmt.Errorf("failed to validate OVS bridge: %w", err)
 	}
-	err = o.validateConfig()
-	if err != nil {
-		return fmt.Errorf("failed to validate OVN-K configuration: %w", err)
-	}
 	return nil
 }
 
@@ -56,27 +53,17 @@ func (o *OVNKubernetesConfig) validateOVSBridge() error {
 	return nil
 }
 
-// validateConfig validates the user defined configuration in /etc/microshift/ovn.yaml
-func (o *OVNKubernetesConfig) validateConfig() error {
-	// validate MTU conf
-	iface, err := net.InterfaceByName(OVNGatewayInterface)
-	if err != nil {
-		return fmt.Errorf("failed to find OVN gateway interface %q: %w", OVNGatewayInterface, err)
-	}
-
-	if iface.MTU < o.MTU {
-		return fmt.Errorf("interface MTU (%d) is too small for specified overlay (%d)", iface.MTU, o.MTU)
-	}
-	return nil
-}
-
-// getClusterMTU retrieves MTU from ovn-kubernetes gateway interface "br-ex",
-// and falls back to use 1500 when "br-ex" mtu is unable to get or less than 0.
+// getClusterMTU retrieves MTU from the default route network interface,
+// and falls back to use 1500 when unable to get the mtu or less than 0.
 func (o *OVNKubernetesConfig) getClusterMTU(multinode bool) {
-	link, err := net.InterfaceByName(OVNGatewayInterface)
+	klog.Infof("getClusterMTU: finding default route interface")
+	link, err := util.FindDefaultRouteIface()
+
 	if err == nil && link.MTU > 0 {
+		klog.Infof("getClusterMTU: Using Interface %s with MTU %d as source default route.", link.Name, link.MTU)
 		o.MTU = link.MTU
 	} else {
+		klog.Infof("getClusterMTU: Couldnt extract MTU from the default route interface , Using Default MTU.")
 		o.MTU = defaultMTU
 	}
 

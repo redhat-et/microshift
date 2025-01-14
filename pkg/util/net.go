@@ -16,9 +16,12 @@ limitations under the License.
 package util
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"crypto/tls"
 	"fmt"
+	"io"
 	tcpnet "net"
 	"net/http"
 	"os"
@@ -33,6 +36,18 @@ import (
 )
 
 var previousGatewayIP string = ""
+
+const (
+	ipv4RouteFile = "/proc/net/route"
+)
+
+type routeStruct struct {
+	// Name of interface
+	Iface string
+
+	// big-endian hex string
+	Gateway string
+}
 
 // Remember whether we have successfully found the hard-coded nodeIP
 // on this host.
@@ -265,4 +280,91 @@ func GetHostIPv6(ipHint string) (string, error) {
 	}
 
 	return "", fmt.Errorf("unable to find host IPv6 address")
+}
+
+// Find the Default route Interface based on /proc/net/route entries
+func FindDefaultRouteIface() (iface *tcpnet.Interface, err error) {
+	bytes, err := readRoutes()
+	if err != nil {
+		return nil, err
+	}
+	ifaceStr, err := parseGatewayIface(bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return tcpnet.InterfaceByName(ifaceStr)
+}
+
+func readRoutes() ([]byte, error) {
+	f, err := os.Open(ipv4RouteFile)
+	if err != nil {
+		return nil, fmt.Errorf("can't access %s", ipv4RouteFile)
+	}
+	defer f.Close()
+
+	bytes, err := io.ReadAll(f)
+	if err != nil {
+		return nil, fmt.Errorf("can't read %s", ipv4RouteFile)
+	}
+
+	return bytes, nil
+}
+
+func parseGatewayIface(output []byte) (string, error) {
+	parsedStruct, err := parseTorouteStruct(output)
+	if err != nil {
+		return "", err
+	}
+	return parsedStruct.Iface, nil
+}
+
+func parseTorouteStruct(output []byte) (routeStruct, error) {
+	// parseLinuxProcNetRoute parses the route file located at /proc/net/route
+	// and returns the IP address of the default gateway. The default gateway
+	// is the one with Destination value of 0.0.0.0.
+	//
+	// The Linux route file has the following format:
+	//
+	// $ cat /proc/net/route
+	//
+	// Iface   Destination Gateway     Flags   RefCnt  Use Metric  Mask
+	// eno1    00000000    C900A8C0    0003    0   0   100 00000000    0   00
+	// eno1    0000A8C0    00000000    0001    0   0   100 00FFFFFF    0   00
+	const (
+		sep              = "\t" // field separator
+		destinationField = 1    // field containing hex destination address
+		gatewayField     = 2    // field containing hex gateway address
+		maskField        = 7    // field containing hex mask
+	)
+	scanner := bufio.NewScanner(bytes.NewReader(output))
+
+	// Skip header line
+	if !scanner.Scan() {
+		err := scanner.Err()
+		if err == nil {
+			return routeStruct{}, fmt.Errorf("no gateway found")
+		}
+
+		return routeStruct{}, err
+	}
+
+	for scanner.Scan() {
+		row := scanner.Text()
+		tokens := strings.Split(row, sep)
+		if len(tokens) < 11 {
+			return routeStruct{}, fmt.Errorf("invalid route file")
+		}
+
+		// The default interface is the one that's 0 for both destination and mask.
+		if !(tokens[destinationField] == "00000000" && tokens[maskField] == "00000000") {
+			continue
+		}
+
+		return routeStruct{
+			Iface:   tokens[0],
+			Gateway: tokens[2],
+		}, nil
+	}
+	return routeStruct{}, fmt.Errorf("no gateway found")
 }
