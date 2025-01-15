@@ -1,0 +1,90 @@
+[customizations.installer.kickstart]
+contents = """
+lang en_US.UTF-8
+keyboard us
+timezone UTC
+text
+reboot
+
+# Configure network to use DHCP and activate on boot
+network --bootproto=dhcp --device=link --activate --onboot=on
+
+# Partition disk with a 1MB BIOS boot, 200M EFI, 800M boot XFS partition and
+# an LVM volume containing a 10GB+ system root. The remainder of the volume
+# will be used by the CSI driver for storing data
+#
+# For example, a 20GB disk would be partitioned in the following way:
+#
+# NAME          MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+# sda             8:0    0  20G  0 disk
+# ├─sda1          8:1    0   1M  0 part
+# ├─sda2          8:2    0 200M  0 part /boot/efi
+# ├─sda3          8:3    0 800M  0 part /boot
+# └─sda4          8:4    0  19G  0 part
+#  └─rhel-root  253:0    0  10G  0 lvm  /sysroot
+#
+zerombr
+clearpart --all --disklabel gpt
+part biosboot --fstype=biosboot --size=1
+part /boot/efi --fstype=efi --size=200
+part /boot --fstype=xfs --asprimary --size=800
+# Uncomment this line to add a SWAP partition of the recommended size
+#part swap --fstype=swap --recommended
+part pv.01 --grow
+volgroup rhel pv.01
+logvol / --vgname=rhel --fstype=xfs --size=REPLACE_LVM_SYSROOT_SIZE --name=root
+
+# Lock root user account
+rootpw --lock
+
+# Configure ostree
+ostreesetup --nogpg --osname=rhel --remote=edge --url=file:///run/install/repo/ostree/repo --ref=rhel/REPLACE_OSVERSION/REPLACE_BUILD_ARCH/edge
+
+%post --log=/var/log/anaconda/post-install.log --erroronfail
+
+# Update the ostree server URL
+ostree remote delete edge
+ostree remote add --no-gpg-verify edge REPLACE_OSTREE_SERVER_URL
+
+# The pull secret is mandatory for MicroShift builds on top of OpenShift, but not OKD
+# The /etc/crio/crio.conf.d/microshift.conf references the /etc/crio/openshift-pull-secret file
+cat > /etc/crio/openshift-pull-secret <<EOF
+REPLACE_OCP_PULL_SECRET_CONTENTS
+EOF
+chmod 600 /etc/crio/openshift-pull-secret
+
+# Create a default redhat user, allowing it to run sudo commands without password
+useradd -m -d /home/redhat -p redhat redhat
+echo -e 'redhat\tALL=(ALL)\tNOPASSWD: ALL' > /etc/sudoers.d/microshift
+
+# Add authorized ssh keys
+mkdir -m 700 /home/redhat/.ssh
+cat > /home/redhat/.ssh/authorized_keys <<EOF
+REPLACE_REDHAT_AUTHORIZED_KEYS_CONTENTS
+EOF
+chmod 600 /home/redhat/.ssh/authorized_keys
+
+# Make sure redhat user directory contents ownership is correct
+chown -R redhat:redhat /home/redhat/
+
+# Configure the firewall (rules reload is not necessary here)
+firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
+firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
+
+# Make the KUBECONFIG from MicroShift directly available for the root user
+echo -e 'export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig' >> /root/.profile
+
+# Configure systemd journal service to persist logs between boots and limit their size to 1G
+sudo mkdir -p /etc/systemd/journald.conf.d
+cat > /etc/systemd/journald.conf.d/microshift.conf <<EOF
+[Journal]
+Storage=persistent
+SystemMaxUse=1G
+RuntimeMaxUse=1G
+EOF
+
+# Update certificate trust storage in case new certificates were
+# installed at /etc/pki/ca-trust/source/anchors directory
+update-ca-trust
+%end
+"""
