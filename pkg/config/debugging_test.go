@@ -44,12 +44,12 @@ func TestGetVerbosity(t *testing.T) {
 		},
 		{
 			setting:  "TraceAll",
-			level:    8,
+			level:    10,
 			warnings: 0,
 		},
 		{
 			setting:  "traceall",
-			level:    8,
+			level:    10,
 			warnings: 0,
 		},
 		{

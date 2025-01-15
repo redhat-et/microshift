@@ -20,7 +20,7 @@ var logLevelNames = map[string]int{
 	"normal":   2,
 	"debug":    4,
 	"trace":    6,
-	"traceall": 8,
+	"traceall": 10,
 }
 
 // computeLoggingSetting validates the logging setting and saves a
