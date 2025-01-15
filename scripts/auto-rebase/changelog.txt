@@ -1,0 +1,5 @@
+- kubernetes image-arm64 205ac00c56dd2340b90dc0e328be84e77219197c to d93c78ae6fd13542228ed371626bee3c3e8d7e91
+  - 5d18fcd9c 2024-12-11T15:40:47+00:00 UPSTREAM: <carry>: require configuration file enablement
+  - a2bc30e98 2024-12-11T15:40:46+00:00 UPSTREAM: 126750: update comments
+  - 08daca616 2024-12-11T15:40:46+00:00 UPSTREAM: 126750: Add takeByTopologyUnCoreCachePacked if policy option align-cpus-by-uncorecache is enabled. Adding new function to evaluate uncore cache id. Reverse allocation logic. Implement preferAlignByUncorecache within TakeByTopologyNUMAPacked, along with new test cases.
+
