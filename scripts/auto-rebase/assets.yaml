@@ -37,7 +37,9 @@ assets:
       - file: service-cloud.yaml
       - file: serving-certificate.yaml
         git_restore: True
-      - file: cluster-role-aggregate-route.yaml
+      - file: cluster-role-aggregate-edit-route.yaml
+        git_restore: True
+      - file: cluster-role-aggregate-admin-route.yaml
         git_restore: True
 
   - dir: components/ovn/

@@ -1,6 +1,8 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
   name: system:router
 rules:
 - apiGroups:
