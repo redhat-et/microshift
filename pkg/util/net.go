@@ -34,6 +34,14 @@ import (
 
 var previousGatewayIP string = ""
 
+type routeStruct struct {
+	// Name of interface
+	Iface string
+
+	// big-endian hex string
+	Gateway string
+}
+
 // Remember whether we have successfully found the hard-coded nodeIP
 // on this host.
 var foundHardCodedNodeIP bool
@@ -265,4 +273,56 @@ func GetHostIPv6(ipHint string) (string, error) {
 	}
 
 	return "", fmt.Errorf("unable to find host IPv6 address")
+}
+
+// Find the Default route Interface based on ipv4 or ipv6 routes.
+func FindDefaultRouteIface() (iface *tcpnet.Interface, err error) {
+
+	// first try IPv4
+	parsedStruct, err := findDefaultRouteForFamily(netlink.FAMILY_V4)
+	if err != nil {
+
+		// then try IPv6
+		parsedStruct, err = findDefaultRouteForFamily(netlink.FAMILY_V6)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	iface, err = tcpnet.InterfaceByName(parsedStruct.Iface)
+	if err != nil {
+		return nil, err
+	}
+
+	return iface, nil
+}
+
+func findDefaultRouteForFamily(family int) (routeStruct, error) {
+	handle, err := netlink.NewHandle()
+	if err != nil {
+		return routeStruct{}, err
+	}
+
+	routeList, err := handle.RouteList(nil, family)
+	if err != nil {
+		return routeStruct{}, err
+	}
+
+	for _, route := range routeList {
+
+		//  for Default route the Destination should be nil (0)
+		if route.Dst == nil {
+			link, err := handle.LinkByIndex(route.LinkIndex)
+			if err != nil {
+				return routeStruct{}, err
+			}
+			return routeStruct{
+				Iface:   link.Attrs().Name,
+				Gateway: route.Gw.String(),
+			}, nil
+
+		}
+
+	}
+	return routeStruct{}, fmt.Errorf("no default gateway found")
 }
