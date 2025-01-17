@@ -1,0 +1,81 @@
+receivers:
+#  otlp:
+#    protocol:
+#      grpc: $MICROSHIFT_IP:6666
+#  filelog/workload:
+#    Path: /….
+#  filelog/kube-system:
+#    Path: /….
+  kubeletstats:
+    auth_type: tls
+    ca_file: /etc/pki/microshift-opentelemetry-collector-client/client-ca.crt
+    key_file: /etc/pki/microshift-opentelemetry-collector-client/client.key
+    cert_file: /etc/pki/microshift-opentelemetry-collector-client/client.crt
+    insecure_skip_verify: true
+    collection_interval: 20s
+    endpoint: "localhost:10250"
+  hostmetrics:
+    root_path: /
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      load:
+      memory:
+  hostmetrics/disk:
+    root_path: /
+    collection_interval: 10s
+    scrapers:
+      disk:
+      filesystem:
+  hostmetrics/network:
+    root_path: /
+    collection_interval: 10s
+    scrapers:
+      network:
+  journald:
+    units:
+    - microshift
+    - crio
+
+processors:
+  resourcedetection/system:
+    detectors: [system]
+    system:
+
+exporters:
+  otlp:
+    sending_queue:
+      storage: file_storage
+    endpoint: # IP|HOSTNAME REQUIRED
+    tls:
+      insecure: true
+  debug:
+
+extensions:
+  file_storage:
+    directory: /var/lib/otelcol
+    create_directory: true
+    fsync: true
+    compaction:
+      directory: /var/lib/otelcol
+      on_rebound: true
+      # when allocated data exceeds this amount, the "compaction needed" flag will be enabled
+      # rebound_needed_threshold_mib: 100 # Default
+      # if the "compaction needed" flag is set and allocated data drops below this amount, compaction will begin and the "compaction needed" flag will be cleared
+      # rebound_trigger_threshold_mib: 10 # Default
+      # specifies how frequently the conditions for compaction are being checked
+      check_interval: 5s # Default
+
+service:
+  extensions: [file_storage]
+  pipelines:
+    metrics/kubeletstats:
+      receivers: [kubeletstats]
+      exporters: [otlp]
+    metrics:
+      receivers: [hostmetrics, hostmetrics/disk, hostmetrics/network]
+      processors: [resourcedetection/system]
+      exporters: [otlp, debug]
+    logs:
+      receivers: [journald]
+      exporters: [otlp, debug]

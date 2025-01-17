@@ -1,0 +1,19 @@
+[Unit]
+Description=MicroShift Observability
+BindsTo=microshift.service
+After=microshift.service
+AssertPathExists=/var/lib/microshift/certs/kube-apiserver-localhost-signer/observability/client.key
+AssertPathExists=/var/lib/microshift/certs/kube-apiserver-localhost-signer/observability/client.crt
+
+[Service]
+ExecStart=/usr/bin/opentelemetry-collector --config=/etc/microshift/opentelemetry-collector.yaml
+Restart=always
+User=root
+TimeoutStartSec=60
+
+# It takes a bit for the certs to be created. This service will reach it's burst limit almost immediately, pretty much
+# guaranteeing that it will reach the restart limit before it can possibly succeed.
+RestartSec=200ms
+
+[Install]
+WantedBy=multi-user.target
