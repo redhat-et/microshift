@@ -8,3 +8,7 @@
 /usr/bin/microshift		--	gen_context(system_u:object_r:kubelet_exec_t,s0)
 /usr/local/bin/microshift-etcd	--	gen_context(system_u:object_r:kubelet_exec_t,s0)
 /usr/bin/microshift-etcd	--	gen_context(system_u:object_r:kubelet_exec_t,s0)
+/var/lib/kubelet/pods/[^/]+/volumes/kubernetes.io~projected/[^/]+	gen_context(system_u:object_r:tmpfs_t,s0)
+/var/lib/kubelet/pods/[^/]+/volumes/kubernetes.io~projected/[^/]+/.*	gen_context(system_u:object_r:container_runtime_tmpfs_t,s0)
+/var/lib/kubelet/pods/[^/]+/volumes/kubernetes.io~secret/[^/]+		gen_context(system_u:object_r:tmpfs_t,s0)
+/var/lib/kubelet/pods/[^/]+/volumes/kubernetes.io~secret/[^/]+/.*	gen_context(system_u:object_r:container_runtime_tmpfs_t,s0)
