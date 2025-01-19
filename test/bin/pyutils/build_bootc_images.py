@@ -250,6 +250,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
 
             push_args = [
                 "sudo", "podman", "push",
+                "--authfile", PULL_SECRET,
                 cf_outname,
                 f"{MIRROR_REGISTRY}/{cf_outname}"
             ]
@@ -382,6 +383,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
         try:
             dst_ref_cmd = [
                 "skopeo", "inspect",
+                "--authfile", PULL_SECRET,
                 f"docker://{ce_targetimg}",
                 "2>/dev/null", "|",
                 "jq", "-r", "'.Labels[\"ostree.commit\"]'"
@@ -411,9 +413,12 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
                 common.record_junit(ce_path, "process-container-encapsulate", "SKIPPED")
                 return
 
-            # Run the container image build command
+            # Run the container image build command.
+            # The REGISTRY_AUTH_FILE setting is required for skopeo to succeed
+            # in accessing container registries that might require authentication.
             build_args = [
-                "sudo", "rpm-ostree", "compose",
+                "sudo", f"REGISTRY_AUTH_FILE={PULL_SECRET}",
+                "rpm-ostree", "compose",
                 "container-encapsulate",
                 "--repo", os.path.join(IMAGEDIR, "repo"),
                 ce_imgref,
@@ -427,6 +432,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
             # necessary for subsequent builds that depend on this container image
             copy_args = [
                 "sudo", "skopeo", "copy",
+                "--authfile", PULL_SECRET,
                 f"docker://{ce_targetimg}",
                 f"containers-storage:{ce_localimg}"
             ]
@@ -552,8 +558,6 @@ def main():
             extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
-        # Run the mirror registry
-        common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
@@ -561,6 +565,13 @@ def main():
             ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
             ifile = os.path.join(ipkgdir, ifile)
             run_template_cmd(ifile, ofile, args.dry_run)
+        # Run the mirror registry
+        common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
+        # Add local registry credentials to the input pull secret file
+        global PULL_SECRET
+        opull_secret = os.path.join(BOOTC_IMAGE_DIR, "pull_secret.json", )
+        common.update_pull_secret(PULL_SECRET, opull_secret, MIRROR_REGISTRY)
+        PULL_SECRET = opull_secret
         # Process individual group directory
         if args.group_dir:
             process_group(args.group_dir, args.build_type, args.dry_run)

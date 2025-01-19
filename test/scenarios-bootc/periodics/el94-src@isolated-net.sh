@@ -5,7 +5,7 @@
 # Redefine network-related settings to use the isolated network bridge
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_ISOLATED_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
-MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
+MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}/microshift"
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc-isolated.ks.template rhel94-bootc-source-isolated

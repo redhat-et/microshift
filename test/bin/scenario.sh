@@ -26,6 +26,7 @@ VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
 VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
+IMAGE_SIGSTORE_ENABLED=true # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
@@ -292,6 +293,7 @@ prepare_kickstart() {
             -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
             -e "s|REPLACE_MIRROR_PORT|${MIRROR_REGISTRY_PORT}|g" \
             -e "s|REPLACE_VM_BRIDGE_IP|${VM_BRIDGE_IP}|g" \
+            -e "s|REPLACE_IMAGE_SIGSTORE_ENABLED|${IMAGE_SIGSTORE_ENABLED}|g" \
             "${ifile}" > "${output_file}"
     done
     record_junit "${vmname}" "prepare_kickstart" "OK"
@@ -610,7 +612,13 @@ launch_vm() {
     fi
 
     for n in ${network}; do
-        vm_network_args+="--network network=${n},model=virtio "
+        # For simplicity we assume that network filters are named the same as the networks
+        # If there is a filter with the same name as the network, attach it to the NIC
+        vm_network_args+="--network network=${n},model=virtio"
+        if sudo virsh nwfilter-list | awk '{print $2}' | grep -qx "${n}"; then
+            vm_network_args+=",filterref=${n}"
+        fi
+        vm_network_args+=" "
     done
     if [ -z "${vm_network_args}" ] ; then
         vm_network_args="--network none"
@@ -1020,11 +1028,11 @@ load_subscription_manager_plugin() {
 #   - nginx server
 #   - registry mirror
 check_dependencies() {
-    if [ $(pgrep -cx nginx) -eq 0 ] ; then
+    if [ $(pgrep -cx -U "$(id -u)" nginx) -eq 0 ] ; then
         "${TESTDIR}/bin/manage_webserver.sh" "start"
     fi
 
-    if ! podman ps --format '{{.Names}}' | grep -q ^microshift-local-registry  ; then
+    if ! sudo podman ps --format '{{.Names}}' | grep -q ^microshift-quay  ; then
         "${TESTDIR}/bin/mirror_registry.sh"
     fi
 }

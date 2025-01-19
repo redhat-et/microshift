@@ -7,6 +7,8 @@ import sys
 import subprocess
 import time
 import threading
+import base64
+import json
 from typing import List
 
 
@@ -260,3 +262,27 @@ def get_last_n_lines(filename: str, lines: int):
 def escape_xml(input: str):
     """Escape xml by replacing &<>\' chars with their character references"""
     return input.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&apos;")
+
+
+def update_pull_secret(ifname: str, ofname: str, registry: str):
+    """Create a new pull secret file containing authentication information for
+    both remote and local registries
+    """
+    # Base64-encode the password
+    encoded_pass = base64.b64encode("microshift:microshift".encode()).decode()
+    # Local registry authentication entry
+    new_secret = {
+        registry: {
+            "auth": encoded_pass
+        }
+    }
+    # Read the input data
+    with open(ifname, "r") as ifile:
+        json_data = json.load(ifile)
+    # Append the new auth entry
+    json_data["auths"].update(new_secret)
+    # Write the updated file
+    with open(ofname, "w") as ofile:
+        json.dump(json_data, ofile, indent=2)
+    # Update the output file permissions
+    os.chmod(ofname, 0o600)

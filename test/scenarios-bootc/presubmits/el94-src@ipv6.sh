@@ -12,7 +12,7 @@ WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 # network gateway in the host, we need to use a combination of the hostname
 # plus /etc/hosts resolution (which is taken care of by kickstart).
 # shellcheck disable=SC2034  # used elsewhere
-MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}"
+MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}/microshift"
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source

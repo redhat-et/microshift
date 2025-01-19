@@ -1,6 +1,11 @@
 <network>
   <name>${VM_ISOLATED_NETWORK}</name>
-  <forward mode='none'/>
+  <!-- An isolated network would ideally have no forwarding. We are using
+       NAT here because Quay registry for mirroring requires traffic forwarding
+       between private IPs in the hypervisor. In order to create the isolation a
+       nwfilter is used to mimick the forward mode none that should be here. Only
+       private IPs and DHCP are allowed. See isolated-netfilter.xml -->
+  <forward mode='nat'/>
   <ip address='192.168.111.1' netmask='255.255.255.0' localPtr='yes'>
     <dhcp>
       <range start='192.168.111.100' end='192.168.111.254'/>

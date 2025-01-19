@@ -1,0 +1,16 @@
+<filter name='${VM_ISOLATED_NETWORK}' chain='root'>
+    <!-- Allow outgoing traffic to private IP ranges and DHCP -->
+    <rule action='accept' direction='out' priority='500'>
+        <ip dstipaddr='192.168.0.0' dstipmask='16'/>
+    </rule>
+    <rule action='accept' direction='out' priority='500'>
+        <ip dstipaddr='10.0.0.0' dstipmask='8'/>
+    </rule>
+    <rule action='accept' direction='inout' priority='500'>
+        <ip srcportstart='67' srcportend='68' protocol='udp'/>
+    </rule>
+    <!-- Drop all other outgoing IP traffic -->
+    <rule action='drop' direction='out' priority='501'>
+        <ip/>
+    </rule>
+</filter>

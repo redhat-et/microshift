@@ -21,7 +21,7 @@ fi
      git composer-cli ostree rpm-ostree \
      cockpit-composer bash-completion podman runc genisoimage \
      createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
-     containernetworking-plugins expect"
+     containernetworking-plugins expect httpd-tools"
 
 if grep -qE "Red Hat Enterprise Linux.*Beta" /etc/redhat-release; then
    VID=$(source /etc/os-release && echo "${VERSION_ID}")

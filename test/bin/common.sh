@@ -191,7 +191,7 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP:-$(hostname)}:${WEB_SERVER_PORT}"
 export MIRROR_REGISTRY_PORT=5000
 
 # Mirror registry URL using VM bridge IP with fallback to host name
-MIRROR_REGISTRY_URL="${VM_BRIDGE_IP:-$(hostname)}:${MIRROR_REGISTRY_PORT}"
+MIRROR_REGISTRY_URL="${VM_BRIDGE_IP:-$(hostname)}:${MIRROR_REGISTRY_PORT}/microshift"
 export MIRROR_REGISTRY_URL
 
 get_build_branch() {

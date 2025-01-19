@@ -21,7 +21,7 @@ spec:
       type: RuntimeDefault
   containers:
   - name: test-container
-    image: nginxinc/nginx-unprivileged:latest
+    image: docker.io/nginxinc/nginx-unprivileged:latest
     securityContext:
       allowPrivilegeEscalation: false
       capabilities:

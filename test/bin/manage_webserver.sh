@@ -24,7 +24,7 @@ EOF
 
 action_stop() {
     echo "Stopping web server"
-    sudo pkill nginx || true
+    pkill -U "$(id -u)" nginx || true
     exit 0
 }
 
@@ -70,8 +70,8 @@ EOF
     sudo chgrp -R "$(id -gn)" /var/lib/nginx
 
     # Kill running nginx processes and wait until down
-    sudo pkill nginx || true
-    while pidof nginx &>/dev/null ; do
+    pkill -U "$(id -u)" nginx || true
+    while pgrep -U "$(id -u)" nginx &>/dev/null ; do
         sleep 1
     done
 
