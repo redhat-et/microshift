@@ -26,6 +26,7 @@ VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
 VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
+IMAGE_SIGSTORE_ENABLED=true # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
@@ -300,6 +301,7 @@ prepare_kickstart() {
             -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
             -e "s|REPLACE_MIRROR_PORT|${MIRROR_REGISTRY_PORT}|g" \
             -e "s|REPLACE_VM_BRIDGE_IP|${VM_BRIDGE_IP}|g" \
+            -e "s|REPLACE_IMAGE_SIGSTORE_ENABLED|${IMAGE_SIGSTORE_ENABLED}|g" \
             "${ifile}" > "${output_file}"
     done
     record_junit "${vmname}" "prepare_kickstart" "OK"

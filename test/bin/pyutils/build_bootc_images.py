@@ -393,6 +393,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
         try:
             dst_ref_cmd = [
                 "skopeo", "inspect",
+                "--authfile", PULL_SECRET,
                 f"docker://{ce_targetimg}",
                 "2>/dev/null", "|",
                 "jq", "-r", "'.Labels[\"ostree.commit\"]'"
@@ -422,9 +423,12 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
                 common.record_junit(ce_path, "process-container-encapsulate", "SKIPPED")
                 return
 
-            # Run the container image build command
+            # Run the container image build command.
+            # The REGISTRY_AUTH_FILE setting is required for skopeo to succeed
+            # in accessing container registries that might require authentication.
             build_args = [
-                "sudo", "rpm-ostree", "compose",
+                "sudo", f"REGISTRY_AUTH_FILE={PULL_SECRET}",
+                "rpm-ostree", "compose",
                 "container-encapsulate",
                 "--repo", os.path.join(IMAGEDIR, "repo"),
                 ce_imgref,
@@ -438,6 +442,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
             # necessary for subsequent builds that depend on this container image
             copy_args = [
                 "sudo", "skopeo", "copy",
+                "--authfile", PULL_SECRET,
                 f"docker://{ce_targetimg}",
                 f"containers-storage:{ce_localimg}"
             ]

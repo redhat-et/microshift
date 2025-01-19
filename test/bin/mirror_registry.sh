@@ -18,10 +18,30 @@ setup_prereqs() {
         "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
     fi
 
+    # Create registry repository base directory structure
+    mkdir -p "${MIRROR_REGISTRY_DIR}"
+    mkdir -p "${QUAY_CONFIG_DIR}"
+
+    # Create a new pull secret file containing authentication information for both
+    # remote (from PULL_SECRET environment) and local registries
+    cat > "${QUAY_CONFIG_DIR}/microshift_auth.json" <<EOF
+{
+    "auths": {
+        "${MIRROR_REGISTRY_URL}": {
+            "auth": "$(echo -n 'microshift:microshift' | base64)"
+        }
+    }
+}
+EOF
+    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${QUAY_CONFIG_DIR}/microshift_auth.json" > "${QUAY_CONFIG_DIR}/pull_secret.json"
+    chmod 600 "${QUAY_CONFIG_DIR}/pull_secret.json"
+    # Reset the pull secret variable to point to the new file
+    PULL_SECRET="${QUAY_CONFIG_DIR}/pull_secret.json"
+
     # TLS authentication is disabled in Quay local registry. The mirror-images.sh
     # helper uses skopeo without TLS options and it defaults to https, so we need
     # to configure registries.conf.d for skopeo to try http instead.
-    sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' << EOF
+    sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' <<EOF
 [[registry]]
     prefix = ""
     location = "${MIRROR_REGISTRY_URL}"
@@ -42,25 +62,41 @@ setup_prereqs() {
     insecure = true
 EOF
 
-    # Create registry repository base directory structure
-    mkdir -p "${MIRROR_REGISTRY_DIR}"
-    mkdir -p "${QUAY_CONFIG_DIR}"
-
-    # Create a new pull secret file containing authentication information for both
-    # remote (from PULL_SECRET environment) and local registries
-    cat > "${QUAY_CONFIG_DIR}/microshift_auth.json" <<EOF
-{
-    "auths": {
-        "${MIRROR_REGISTRY_URL}": {
-            "auth": "$(echo -n 'microshift:microshift' | base64)"
-        }
-    }
-}
+# Complete the source registry configuration to use sigstore attachments.
+# Note that registry.redhat.io.yaml file already exists, but it is missing the
+# sigstore attachment enablement setting.
+sudo bash -c 'cat > /etc/containers/registries.d/registry.quay.io.yaml' <<'EOF'
+docker:
+    quay.io:
+        use-sigstore-attachments: true
 EOF
-    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${QUAY_CONFIG_DIR}/microshift_auth.json" > "${QUAY_CONFIG_DIR}/pull_secret.json"
-    chmod 600 "${QUAY_CONFIG_DIR}/pull_secret.json"
-    # Reset the pull secret variable to point to the new file
-    PULL_SECRET="${QUAY_CONFIG_DIR}/pull_secret.json"
+
+if [   -e /etc/containers/registries.d/registry.redhat.io.yaml ] &&
+   [ ! -e /etc/containers/registries.d/registry.redhat.io.yaml.orig ]; then
+   sudo mv /etc/containers/registries.d/registry.redhat.io.yaml /etc/containers/registries.d/registry.redhat.io.yaml.orig
+fi
+
+sudo bash -c 'cat > /etc/containers/registries.d/registry.redhat.io.yaml' <<'EOF'
+docker:
+    registry.redhat.io:
+        use-sigstore-attachments: true
+        sigstore: https://registry.redhat.io/containers/sigstore
+EOF
+
+# Configure the destination local registry to use sigstore attachments.
+# Note: The sigstore staging directory is required because not all registries
+# support direct copy of signatures. In this case, the signatures are downloaded
+# locally and copied to the destination registry.
+local -r quay_base="$(dirname "${MIRROR_REGISTRY_URL}")"
+local -r sigstore="${MIRROR_REGISTRY_DIR}/sigstore-staging"
+
+mkdir -p "${sigstore}"
+sudo bash -c 'cat > /etc/containers/registries.d/registry.quay.local.yaml' <<EOF
+docker:
+    ${quay_base}:
+        use-sigstore-attachments: true
+        lookaside-staging: file://${sigstore}
+EOF
 }
 
 setup_registry() {
