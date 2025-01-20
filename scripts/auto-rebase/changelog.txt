@@ -1,0 +1,3 @@
+- openshift-controller-manager embedded-component 0e91805ec91f46b80b553027fd8a8aab194f50fc to bcf6e58edbcc8e7ce6f7e4d0658635688e0fc114
+  - 66a076f 2024-11-04T14:05:35+00:00 skip unnecessary apply calls
+
