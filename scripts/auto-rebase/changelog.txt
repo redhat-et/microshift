@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component 9a0391243931ff480885f5dbcee8e34a1212aeb7 to 8ad9fcdadcbc0cae358f7e277349d194b32e8277
+  - defa7da 2025-01-16T03:36:23-05:00 Pass transit_switch_subnet options in ovnkube-node pod for single-zone
+
