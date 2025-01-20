@@ -1,0 +1,14 @@
+- cluster-network-operator embedded-component fee8c3129c028c6b72eff93a0f814678d997951e to d69278e76edaa4fcde0c9c78edd686fecad16a95
+  - e2c948c 2024-12-24T12:35:15+00:00 Prevent live migration process from flapping between step-2 and step-3
+
+- openshift-controller-manager embedded-component f2afd434358966ccc09f55d4915d2689ed2cb1b6 to ff69ddfb8f9c752f77e96e867f667e5b8c149935
+  - 9c9a7a5 2025-01-10T15:07:46+00:00 NO-JIRA: Add team members to the OWNERS file
+
+- ovn-kubernetes image-amd64 9c4d3010d46a438f5fe3e2da14832ac0b38de7c2 to cc1522a772fbd586a192a8ceb02980a41734f7b6
+  - defd136 2025-01-06T17:34:56+00:00 interconenct: Ask ovn-northd to bind the remote ports.
+  - 70aa8bf 2024-12-18T17:01:37+08:00 Add hybird overlay pod IPs to the namespace address_set
+
+- ovn-kubernetes image-arm64 9c4d3010d46a438f5fe3e2da14832ac0b38de7c2 to cc1522a772fbd586a192a8ceb02980a41734f7b6
+  - defd136 2025-01-06T17:34:56+00:00 interconenct: Ask ovn-northd to bind the remote ports.
+  - 70aa8bf 2024-12-18T17:01:37+08:00 Add hybird overlay pod IPs to the namespace address_set
+
