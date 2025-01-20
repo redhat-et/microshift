@@ -1,100 +1,13 @@
-- api embedded-component c1a063b1614ac3ccb0fc5ab49ba6158dfe8e3d3e to 52377f09e5c9293d4694c29375b35fb202bae222
-  - 8fd16e29 2025-01-15T14:58:17+00:00 Update lint-fix make target
-  - 0e9d9411 2025-01-13T14:28:23+00:00 Update golangci-lint to v1.63.4
+- cluster-csi-snapshot-controller-operator embedded-component 9dceffb866318acb2bb77182095a18b6f397416f to a68ffe82329d198f79508daeb6c63c6bc2a4e19a
+  - 0878bc0 2025-01-08T17:39:03+01:00 Support HCP labels
 
-- cluster-network-operator embedded-component 2a17ab877fa8e7bef1703be85caed52ada384977 to 722d631aab15ac726c45ad8d2d148843f3ec165b
-  - ea1d489 2025-01-09T18:48:50+01:00 Restart IPsec service only when needed
-  - ece9fbb 2025-01-09T18:48:28+01:00 Revert "Configure narrowing=yes for IPsec connections"
-  - 864bdc5 2025-01-09T11:30:45+01:00 Cleanup ipsec state only when ipsec is not full mode
+- cluster-network-operator embedded-component 722d631aab15ac726c45ad8d2d148843f3ec165b to a967bf84a777795ff47f199c5200341809d250b1
+  - 91b8a78 2025-01-13T20:32:09+01:00 Fix user-defined-networks-namespace-label binding
+  - 69a1624 2024-12-11T16:53:20+00:00 Add host isolation mounts to ovnkube-node
 
-- kubernetes embedded-component 309f240e18f1da87bbe86c18746774d6d302f8ef to 4b2db1ec33faa3ffc305e5ffa7376908cc955370
-  - f2e69f331 2025-01-09T14:03:58-05:00 UPSTREAM: <carry>: k8s-tests-ext should fully initialize test context
-  - eef6379f7 2025-01-09T14:03:48-05:00 UPSTREAM: <drop>: ./hack/update-vendor.sh
+- router image-amd64 7a688b0eab5a27fe13988a21022c774cdeb964b2 to 20f7f41430f7c660438c32532ccd7b453b014b68
+  - ee12f18 2025-01-09T11:22:57-05:00 OCPBUGS-47761: Update default_pub_keys.pem to use SHA256
 
-- operator-framework-olm embedded-component 5423c783cc28cff7a9dc9000478f8b7b8b299762 to 34e05d48c055b317af82867fed6a5ab4448ee5cd
-  - 4bda73cb 2025-01-15T09:19:28+01:00 Upgrade controller-gen v0.16.1 to v0.17.0 (#392)
-  - 107e04d0 2025-01-15T09:19:01+01:00 Upgrade indirect dependencies (#391)
-  - dbc6fe8f 2025-01-15T09:18:56+01:00 bump controller-runtime (#388)
-  - 159dc837 2025-01-15T09:18:53+01:00 Fix go1.33 bump adding toolchain
-  - 760bf4a1 2025-01-15T09:18:49+01:00 Revert "Bump to go1.23"
-  - b03b0015 2025-01-15T09:18:45+01:00 Bump to go1.23
-  - a698ede3 2025-01-15T09:18:37+01:00 bump golang.org/x/net to 0.34.0 (#387)
-  - 65fae060 2025-01-15T09:18:32+01:00 Bump k8s.io/apiextensions-apiserver from 0.31.3 to 0.32.0 (#381)
-  - 80736c58 2025-01-15T09:18:27+01:00 Bump k8s.io/client-go from 0.31.3 to 0.32.0 (#384)
-  - 64b9f1a7 2025-01-15T09:18:24+01:00 :seedling: Bump go to v1.23.0 (#358)
-  - 10b0128f 2025-01-15T09:18:20+01:00 Bump sigs.k8s.io/controller-runtime from 0.19.1 to 0.19.3 (#379)
-  - cbe0bfce 2025-01-15T09:18:16+01:00 Bump github.com/google/cel-go from 0.22.0 to 0.22.1 (#374)
-  - 1586216c 2025-01-15T09:18:12+01:00 Bump k8s.io/apiextensions-apiserver from 0.31.2 to 0.31.3 (#376)
-  - 9716b93c 2025-01-15T09:18:08+01:00 Bump github.com/stretchr/testify from 1.9.0 to 1.10.0 (#375)
-  - 81b9a25e 2025-01-15T09:18:04+01:00 Bump codecov/codecov-action from 4 to 5 (#372)
-  - b99705d7 2025-01-15T09:18:00+01:00 Bump github.com/google/cel-go from 0.20.1 to 0.22.0 (#371)
-  - e3a734c4 2025-01-15T09:17:56+01:00 Bump k8s.io/apiextensions-apiserver from 0.31.1 to 0.31.2 (#369)
-  - e20d2cb2 2025-01-15T09:17:52+01:00 Bump sigs.k8s.io/controller-runtime from 0.19.0 to 0.19.1 (#367)
-  - 0d891bb8 2025-01-15T09:17:48+01:00 Bump k8s.io/api from 0.31.1 to 0.31.2 (#366)
-  - 245e1575 2025-01-15T09:17:44+01:00 fix: add missing comment tags for Conditions (#365)
-  - e260fbd4 2025-01-15T09:17:40+01:00 Bump k8s.io/apiextensions-apiserver from 0.31.0 to 0.31.1 (#360)
-  - 226d7fb7 2025-01-15T09:17:36+01:00 Bump k8s.io/client-go from 0.31.0 to 0.31.1 (#362)
-  - c8a27748 2025-01-15T09:17:31+01:00 Upgrade github.com/operator-framework/api from v0.27.0 to v0.29 (#1540)
-  - 71f768a9 2025-01-15T09:17:26+01:00 Upgrade github.com/containers/common  v0.60.4 => v0.61.0 (#1534)
-  - 3cfda62b 2025-01-15T09:17:22+01:00 Bump github.com/onsi/ginkgo/v2 from 2.22.0 to 2.22.2 (#1536)
-  - 85995168 2025-01-15T09:17:17+01:00 Bump github.com/docker/cli (#1539)
-  - 5f72279b 2025-01-15T09:17:12+01:00 Bump google.golang.org/protobuf from 1.35.2 to 1.36.2 (#1537)
-  - 0f977dc8 2025-01-15T09:17:07+01:00 Bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.9.0 to 6.11.2 (#1535)
-  - c4eb1241 2025-01-15T09:17:03+01:00 Upgrade kind from v0.25.0 to v0.26.0 (#1532)
-  - 73d08d51 2025-01-15T09:16:58+01:00 k8s deps from v0.31.3 to v0.32.0 (#1529)
-  - 9b920669 2025-01-15T09:16:53+01:00 Revert go bump and redo (#1531)
-  - b21e4c52 2025-01-15T09:16:48+01:00 :seedling: Bump Go v1.23.0 (#1431)
-  - ab924541 2025-01-15T09:16:43+01:00 Upgrade controller-runtimr from v0.19.3 to v0.19.4 (#1530)
-  - 886153d5 2025-01-15T09:16:38+01:00 Bump github.com/containerd/containerd from 1.7.23 to 1.7.25 (#1528)
-  - b4a1ab00 2025-01-15T09:16:34+01:00 Upgrade github.com/joelanford/ignore from v0.1.0 to v0.1.1 (#1527)
-  - 738d5a04 2025-01-15T09:16:29+01:00 Bump github.com/containers/image/v5 from 5.32.2 to 5.33.0 (#1493)
-  - 5557f98b 2025-01-15T09:16:25+01:00 Bumps go/net to v0.33.0 (#1522)
-  - c715662b 2025-01-15T09:16:20+01:00 Revert "Bumps go/net to v0.33.0"
-  - 0fb1a0c9 2025-01-15T09:16:15+01:00 Bumps go/net to v0.33.0
-  - 20a412cc 2025-01-15T09:16:10+01:00 provide an optional base image flag for generated dockerfiles from bundle build commands (#1519)
-  - 5cfd75ae 2025-01-15T09:16:05+01:00 Bump github.com/onsi/gomega from 1.36.0 to 1.36.1 (#1515)
-  - e9998daf 2025-01-15T09:16:00+01:00 remove reference of kube-rbac-proxy from mocks and tests (#1518)
-  - c79297c0 2025-01-15T09:15:55+01:00 Bump golang.org/x/sys from 0.27.0 to 0.28.0 (#1508)
-  - d67d26cc 2025-01-15T09:15:50+01:00 Bump golang.org/x/net from 0.31.0 to 0.32.0 (#1511)
-  - e5682138 2025-01-15T09:15:46+01:00 Bump google.golang.org/grpc from 1.68.0 to 1.68.1 (#1512)
-  - 8736c8f0 2025-01-15T09:15:41+01:00 Bump golang.org/x/text from 0.20.0 to 0.21.0 (#1509)
-  - a626c4f4 2025-01-15T09:15:36+01:00 Bump golang.org/x/sync from 0.9.0 to 0.10.0 (#1510)
-  - 3cb8460b 2025-01-15T09:15:32+01:00 Bump sigs.k8s.io/controller-runtime from 0.19.2 to 0.19.3 (#1507)
-  - f83846df 2025-01-15T09:15:27+01:00 Bump github.com/stretchr/testify from 1.9.0 to 1.10.0 (#1506)
-  - b65a95fe 2025-01-15T09:15:22+01:00 Bump github.com/onsi/gomega from 1.35.1 to 1.36.0 (#1503)
-  - 06a81cef 2025-01-15T09:15:17+01:00 Bump k8s.io/apiextensions-apiserver from 0.31.2 to 0.31.3 (#1504)
-  - 1493db57 2025-01-15T09:15:12+01:00 Bump sigs.k8s.io/controller-runtime from 0.19.1 to 0.19.2 (#1501)
-  - 366f7e46 2025-01-15T09:15:03+01:00 Bump k8s.io/api from 0.31.2 to 0.31.3 (#1500)
-  - 0f424b86 2025-01-15T09:14:58+01:00 Bump github.com/onsi/ginkgo/v2 from 2.21.0 to 2.22.0 (#1499)
-  - c7a2ab3c 2025-01-15T09:14:53+01:00 Bump golang.org/x/net from 0.30.0 to 0.31.0 (#1496)
-  - 639e8158 2025-01-15T09:14:48+01:00 Bump codecov/codecov-action from 4 to 5 (#1497)
-  - e5bc14af 2025-01-15T09:14:44+01:00 Bump golang.org/x/mod from 0.21.0 to 0.22.0 (#1495)
-  - 27b6f1e0 2025-01-15T09:14:36+01:00 Bump google.golang.org/protobuf from 1.35.1 to 1.35.2 (#1494)
-  - 7c0c59b2 2025-01-15T09:14:30+01:00 Bump golang.org/x/sync from 0.8.0 to 0.9.0 (#1486) (#1485)
-  - 820d8602 2025-01-15T09:14:25+01:00 Bump sigs.k8s.io/kind from 0.24.0 to 0.25.0 (#1492)
-  - 014f9ed2 2025-01-15T09:14:21+01:00 Bump golang.org/x/net from 0.30.0 to 0.31.0 (#1488)
-  - 3103ded6 2025-01-15T09:14:17+01:00 Bump golang.org/x/mod from 0.21.0 to 0.22.0 (#1490)
-  - 15d86519 2025-01-15T09:14:12+01:00 Bump golang.org/x/sync from 0.8.0 to 0.9.0 (#1486)
-  - cf134e44 2025-01-15T09:14:08+01:00 Bump github.com/distribution/distribution/v3 (#1487)
-  - 29c120a6 2025-01-15T09:14:03+01:00 Bump golang.org/x/sys from 0.26.0 to 0.27.0 (#1484)
-  - 44ac184a 2025-01-15T09:13:58+01:00 Bump github.com/onsi/gomega from 1.35.0 to 1.35.1 (#1483)
-  - 53622033 2025-01-15T09:13:54+01:00 Bump github.com/onsi/ginkgo/v2 from 2.20.2 to 2.21.0 (#1480)
-  - cfce7dd5 2025-01-15T09:13:49+01:00 Bump sigs.k8s.io/controller-runtime from 0.19.0 to 0.19.1 (#1478)
-  - 4bc905a4 2025-01-15T09:13:44+01:00 Bump github.com/onsi/gomega from 1.34.2 to 1.35.0 (#1481)
-  - 98b81176 2025-01-15T09:13:39+01:00 Bump k8s.io/apiextensions-apiserver from 0.31.1 to 0.31.2 (#1474)
-  - 78d50260 2025-01-15T09:13:34+01:00 bump o-f libs (#3487)
-  - 9cb0c76c 2025-01-15T09:13:28+01:00 bump k8s libs to v0.32.0 (#3486)
-  - 0cedd702 2025-01-15T09:13:20+01:00 add bingo-upgrade target (#3489)
-  - 6d38dcf3 2025-01-15T09:13:15+01:00 add protocols to all ports in olm.yaml quickstart (#3421)
-  - 5e949143 2025-01-15T09:13:09+01:00 build(deps): bump github.com/maxbrunsfeld/counterfeiter/v6 (#3481)
-  - c35d31c8 2025-01-15T09:13:04+01:00 Bump go1.23 (#3484)
-  - 29a78323 2025-01-15T09:12:58+01:00 bump golang.org/x/net to 0.34.0 (#3485)
-
-- kubernetes image-amd64 309f240e18f1da87bbe86c18746774d6d302f8ef to 4b2db1ec33faa3ffc305e5ffa7376908cc955370
-  - f2e69f331 2025-01-09T14:03:58-05:00 UPSTREAM: <carry>: k8s-tests-ext should fully initialize test context
-  - eef6379f7 2025-01-09T14:03:48-05:00 UPSTREAM: <drop>: ./hack/update-vendor.sh
-
-- kubernetes image-arm64 309f240e18f1da87bbe86c18746774d6d302f8ef to 4b2db1ec33faa3ffc305e5ffa7376908cc955370
-  - f2e69f331 2025-01-09T14:03:58-05:00 UPSTREAM: <carry>: k8s-tests-ext should fully initialize test context
-  - eef6379f7 2025-01-09T14:03:48-05:00 UPSTREAM: <drop>: ./hack/update-vendor.sh
+- router image-arm64 7a688b0eab5a27fe13988a21022c774cdeb964b2 to 20f7f41430f7c660438c32532ccd7b453b014b68
+  - ee12f18 2025-01-09T11:22:57-05:00 OCPBUGS-47761: Update default_pub_keys.pem to use SHA256
 
